@@ -1,0 +1,54 @@
+{
+    "name": "gsw945/Slim-Upload-Demo",
+    "description": "Slim上传示例",
+    "keywords": [
+        "slim",
+        "rest",
+        "router",
+        "psr7"
+    ],
+    "homepage": "https://github.com/gsw945/Slim-Upload-Demo",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "gsw945",
+            "email": "gsw945@foxmail.com",
+            "homepage": "https://gsw945.com/"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "slim/slim": "^3",
+        "monolog/monolog": "^1",
+        "slim/twig-view": "^2",
+        "paragonie/constant_time_encoding": "^1",
+        "phpseclib/phpseclib": "2.0.4",
+        "league/flysystem": "^1.0",
+        "league/flysystem-ziparchive": "^1.0",
+        "league/flysystem-cached-adapter": "^1.0",
+        "dflydev/apache-mime-types": "^1.0",
+        "pekkis/mime-types": "^1.0"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "App\\Middlewares\\": "src/middlewares/",
+            "App\\Controllers\\": "src/controllers/"
+        },
+        "files": [
+            "src/functions.php",
+            "src/global_vars.php",
+            "src/apps/FileView.php"
+        ]
+    },
+    "autoload-dev": {},
+    "scripts": {
+        "start": "php -S 0.0.0.0:8080 -t public"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    }
+}

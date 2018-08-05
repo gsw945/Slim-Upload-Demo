@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <form action="{{ path_for('file_upload') }}" method="post" enctype="multipart/form-data">
+        请选择文件:<br />
+        <input type="hidden" name="hash" id="hash" value="" />
+        <input type="hidden" name="field" id="field" value="myfile" />
+        <input type="file" name="myfile" id="myfile" /><br /><br />
+        <input type="submit" value="上传" name="submit" />
+    </form>
+    <script type="text/javascript">
+        /**
+         * 生成唯一id
+         * @see https://stackoverflow.com/a/8809472/6528523
+         */
+        function generateUUID() {
+            var d = new Date().getTime();
+            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                d += performance.now(); //use high-precision timer if available
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+        window.onload = function() {
+            var hash = generateUUID().replace(/\-/g, '');
+            document.querySelector('#hash').value = hash;
+        };
+    </script>
+</body>
+</html>

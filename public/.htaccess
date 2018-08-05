@@ -1,0 +1,30 @@
+RewriteEngine On
+
+# Some hosts may require you to use the `RewriteBase` directive.
+# If you need to use the `RewriteBase` directive, it should be the
+# absolute physical path to the directory that contains this htaccess file.
+#
+# RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+
+
+<IfModule mod_xsendfile.c>
+    <Files *.php>
+        XSendFile On
+        SetEnv MOD_X_SENDFILE_ENABLED 1
+    </Files>
+</IfModule>
+
+# ------------------------------------------------------------
+# add a Directory into global Apache config (apache2.conf) 
+# <Directory /home/kz-gsw/apache_www/kz-damp/local_store/>
+#         Options Indexes FollowSymLinks MultiViews
+#         XSendFile On
+#         AllowOverride All
+#         Order allow,deny
+#         allow from all
+#         XSendFilePath /home/kz-gsw/apache_www/kz-damp/local_store/
+# </Directory>
+# ------------------------------------------------------------
