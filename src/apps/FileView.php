@@ -10,11 +10,20 @@ use Slim\Http\Response;
  */
 class FileView extends \App\Controllers\ControllerBase {
     /**
-     * 主页面
+     * 单文件上传页面
      */
     public function single(Request $request, Response $response, $args=[]) {
         $params = [];
 
         return $this->ci->get('twig')->render($response, 'single-upload.twig', $params);
+    }
+
+    /**
+     * 多文件上传页面
+     */
+    public function multiple(Request $request, Response $response, $args=[]) {
+        $params = [];
+
+        return $this->ci->get('twig')->render($response, 'multiple-upload.twig', $params);
     }
 }

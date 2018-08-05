@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+        body { font-family: sans-serif; font-size: 14px; line-height: 1.6em; }
+        .body { width: 800px; margin: 10px auto; }
+
+        /* Upload image dialog */
+        .uploadimage-dragndrop { border: 2px dashed #DDD; margin: 20px 0; padding: 50px 20px; text-align: center; color: #DDD; }
+        .uploadimage-text { font-size: 32px; margin-bottom: 20px; }
+        .uploadimage-input { margin: 20px 0; }
+        .uploadimage-upload { background: #EEE; margin: 4px 0; }
+        .uploadimage-uploadcompleted { background: #d1f4ac; }
+        .uploadimage-fileinfo { padding: 5px; font-size: 11px; position: relative; }
+        .uploadimage-progresspct { position: absolute; top: 5px; right: 5px; }
+        .uploadimage-progress { background: #999; }
+        .uploadimage-progressbar { background: maroon; height: 2px; }
+        .uploadimage-totalprogress { background: #999; }
+        .uploadimage-totalprogressbar { background: #107EC2; height: 6px; }
+
+        .description { margin: 40px 0; }
+    </style>
+</head>
+<body>
+    <div>
+        <input id="upload-input" multiple="multiple" name="myfile" type="file" />
+    </div>
+
+    <div data-bind="template: { name: 'template-uploads' }" id="upload-liveuploads">
+        <div data-bind="visible: showTotalProgress()" style="display: none;">
+            <div>&nbsp;</div>
+            <div class="uploadimage-totalprogress">
+                <div class="uploadimage-totalprogressbar" data-bind="style: { width: totalProgress() + '%' }" style="width: 0%;">&nbsp;</div>
+            </div>
+        </div>
+        <div data-bind="foreach: uploads">&nbsp;</div>
+    </div>
+    <script type="text/html" id="template-uploads">
+        <div data-bind="visible: showTotalProgress()">
+            <div>
+                <span data-bind="text: uploadSpeedFormatted()"></span>
+                <span data-bind="text: timeRemainingFormatted()" style="float: right;"></span>
+            </div>
+            <div class="uploadimage-totalprogress">
+                <div class="uploadimage-totalprogressbar" style="width: 0%;" data-bind="style: { width: totalProgress() + '%' }"></div>
+            </div>
+        </div>
+        <div data-bind="foreach: uploads">
+            <div class="uploadimage-upload" data-bind="css: { 'uploadimage-uploadcompleted': uploadCompleted() }">
+                <div class="uploadimage-fileinfo">
+                    <strong data-bind="text: fileName"></strong>
+                    <span data-bind="text: fileSizeFormated"></span>
+                    <span class="uploadimage-progresspct" data-bind="visible: uploadProgress() < 100"><span data-bind="text: uploadSpeedFormatted()"></span></span>
+                </div>
+                <div class="uploadimage-progress">
+                    <div class="uploadimage-progressbar" style="width: 0%;" data-bind="style: { width: uploadProgress() + '%' }"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/javascript" src="{{ base_url() }}/js/uploader.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}/lib/knockout-min.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}/assets/knockout-models.js"></script>
+    <script type="text/javascript">
+        Window.UPLOAD_URL = "{{ path_for('file_upload') }}";
+        /**
+         * 生成唯一id
+         * @see https://stackoverflow.com/a/8809472/6528523
+         */
+        function generateUUID() {
+            var d = new Date().getTime();
+            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                d += performance.now(); //use high-precision timer if available
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
+        window.onload = function() {
+            if(html5Upload.fileApiSupported()) {
+                var context = document.getElementById('upload-liveuploads'),
+                    uploadsModel = new models.UploadsViewModel();
+
+                html5Upload.initialize({
+                    // URL that handles uploaded files
+                    uploadUrl: Window.UPLOAD_URL,
+                    
+                    // HTML element on which files should be dropped (optional)
+                    // dropContainer: document.getElementById('dragndropimage'),
+
+                    // HTML file input element that allows to select files (optional)
+                    inputField: document.querySelector('#upload-input'),
+
+                    // Key for the file data (optional, default: 'file')
+                    key: 'myfile',
+
+                    // Additional data submitted with file (optional)
+                    data: function(obj) {
+                        var hash = generateUUID().replace(/\-/g, '');
+                        return {
+                            'hash': hash,
+                            'field': 'myfile'
+                        };
+                    },
+
+                    // Maximum number of simultaneous uploads
+                    // Other uploads will be added to uploads queue (optional)
+                    maxSimultaneousUploads: 1,
+
+                    // Callback for each dropped or selected file
+                    // It receives one argument, add callbacks 
+                    // by passing events map object: file.on({ ... })
+                    onFileAdded: function (file) {
+                        /*
+                        var generate_client_id = function() {
+                            return 'id_' + (
+                                (new Date()).getTime() + Math.random()
+                            ).toFixed(10).replace('.', '');
+                        };
+                        file.client_id = generate_client_id();
+                        */
+                       
+                        var fileModel = new models.FileViewModel(file);
+                        uploadsModel.uploads.push(fileModel);
+
+                        file.on({
+                            // Called after received response from the server
+                            onCompleted: function (response) {
+                                // console.log(file.client_id);
+                                // console.log(response);
+                                fileModel.uploadCompleted(true);
+                            },
+                            // Called during upload progress, first parameter
+                            // is decimal value from 0 to 100.
+                            onProgress: function (progress, fileSize, uploadedBytes) {
+                                // console.log(file.client_id);
+                                // console.log(progress);
+                                // console.log(fileSize);
+                                // console.log(uploadedBytes);
+                                var progress_value = parseInt(progress, 10);
+                                // console.log(progress_value);
+                                fileModel.uploadProgress(progress_value);
+                            }
+                        });
+                    }
+                });
+
+                models.applyBindings(uploadsModel, context);
+            }
+            else {
+                alert('HTML5文件上传不支持');
+            }
+        };
+    </script>
+</body>
+</html>

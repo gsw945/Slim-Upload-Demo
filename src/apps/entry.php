@@ -10,6 +10,12 @@ return [
                     'name' => 'file_single_upload'
                 ],
             ],
+            '/multiple[/]' => [
+                'get' => [
+                    'handler' => 'App\Views\FileView:multiple',
+                    'name' => 'file_multiple_upload'
+                ],
+            ],
             '/upload[/]' => [
                 'post' => [
                     'handler' => 'App\Controllers\FileController:upload',

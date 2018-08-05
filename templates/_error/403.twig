@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bad Request</title>
+    <style>
+        body{
+            margin: 0 auto;
+            width: 390px;
+            padding: 30px;
+            font: 12px/1.5 Helvetica,Arial,Verdana,sans-serif;
+        }
+        h1{
+            margin:0;
+            font-size:48px;
+            font-weight:normal;
+            line-height:48px;
+        }
+        strong{
+            display:inline-block;
+            font-size: 1.2em;
+        }
+        #choose-action li {
+            height: 2em;
+            line-height: 2em;
+        }
+        #choose-action li:first-of-type {
+            margin-top: -0.5em;
+        }
+        #choose-action li a,
+        #choose-action li a:visited {
+            text-decoration: none;
+            color: #00f;
+            font-size: 1.2em;
+        }
+        #choose-action li a:hover,
+        #choose-action li a:active {
+            color: #fa1;
+        }
+    </style>
+</head>
+<body>
+    <h1>403 Forbidden</h1>
+    <h2>您对当前页面没有访问权限</h2>
+    <strong>您可以:</strong>
+    <ul id="choose-action">
+        <li><a href='{{ base_url }}/'>访问首页</a></li>
+        <li><a href='{{ path_for('auth_login_view') }}'>==> 登录</a></li>
+    </ul>
+    <script type="text/javascript">
+        function maybeGoBack() {
+            if(window.history.length > 0) {
+                var ul = document.getElementById('choose-action');
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = 'javascript: window.history.go(-1);';
+                a.innerHTML = '返回前页';
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+        }
+        maybeGoBack();
+    </script>
+</body>
+</html>
