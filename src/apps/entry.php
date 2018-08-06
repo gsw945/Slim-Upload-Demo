@@ -38,7 +38,11 @@ return [
                     'handler' => function(\Slim\Http\Request $request, \Slim\Http\Response $response, $args=[]) {
                         $router = $this->get('router');
                         $single_upload_url = $router->pathFor('file_single_upload');
-                        $response->getBody()->write("<a href=\"{$single_upload_url}\">单文件上传</a>");
+                        $multiple_upload_url = $router->pathFor('file_multiple_upload');
+                        $response->getBody()->write(
+                            "<a href=\"{$single_upload_url}\">单文件上传</a>"
+                            + "<br /><a href=\"{$multiple_upload_url}\">多文件上传</a>"
+                        );
                         return $response;
                     },
                     'name' => 'site_home',
