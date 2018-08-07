@@ -35,6 +35,7 @@
         self.key = options.key;
         self.maxSimultaneousUploads = options.maxSimultaneousUploads || -1;
         self.onFileAdded = options.onFileAdded || noop;
+        self.onAllComplete = options.onAllComplete || noop;
         self.uploadUrl = options.uploadUrl;
         self.onFileAddedProxy = function (upload) {
             console.log('Event: onFileAdded, file: ' + upload.fileName);
@@ -45,10 +46,11 @@
     }
 
     // FileUpload proxy class:
-    function FileUpload(file) {
+    function FileUpload(file, inputField) {
         var self = this;
 
         self.file = file;
+        self.inputField = inputField;
         self.fileName = file.name;
         self.fileSize = file.size;
         self.uploadSize = file.size;
@@ -105,7 +107,7 @@
                 manager.on(dropContainer, 'dragenter', cancelEvent);
                 manager.on(dropContainer, 'drop', function (e) {
                     cancelEvent(e);
-                    manager.processFiles(e.dataTransfer.files);
+                    manager.processFiles(e.dataTransfer.files, e.dataTransfer);
                 });
                 */
                 
@@ -115,18 +117,18 @@
                 manager.on(dropContainer, 'drop', function (e) {
                     cancelEvent(e);
                     dragOverOffClass(e);
-                    manager.processFiles(e.dataTransfer.files);
+                    manager.processFiles(e.dataTransfer.files, e.dataTransfer);
                 });
             }
 
             if (inputField) {
                 manager.on(inputField, 'change', function () {
-                    manager.processFiles(this.files);
+                    manager.processFiles(this.files, this);
                 });
             }
         },
 
-        processFiles: function (files) {
+        processFiles: function (files, inputField) {
             console.log('Processing files: ' + files.length);
             var manager = this,
                 len = files.length,
@@ -141,7 +143,7 @@
                     break;
                 }
 
-                upload = new FileUpload(file);
+                upload = new FileUpload(file, inputField);
                 manager.uploadFile(upload);
             }
         },
@@ -211,6 +213,9 @@
                 if (manager.uploadsQueue.length) {
                     manager.ajaxUpload(manager.uploadsQueue.shift());
                 }
+                else{
+                    manager.onAllComplete(upload.inputField);
+                }
             };
 
             // Triggered when upload fails:
@@ -222,7 +227,7 @@
             if (data) {
                 var _data = data;
                 if(_data instanceof Function) {
-                    _data = data();
+                    _data = data(upload);
                 }
                 for (prop in _data) {
                     if (_data.hasOwnProperty(prop)) {

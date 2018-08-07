@@ -100,10 +100,10 @@
                     key: 'myfile',
 
                     // Additional data submitted with file (optional)
-                    data: function(obj) {
-                        var hash = generateUUID().replace(/\-/g, '');
+                    data: function(upload) {
+                        var inputField = upload.inputField;
                         return {
-                            'hash': hash,
+                            'hash': upload.client_id,
                             'field': 'myfile'
                         };
                     },
@@ -115,30 +115,26 @@
                     // Callback for each dropped or selected file
                     // It receives one argument, add callbacks 
                     // by passing events map object: file.on({ ... })
-                    onFileAdded: function (file) {
-                        /*
+                    onFileAdded: function (upload) {
                         var generate_client_id = function() {
-                            return 'id_' + (
-                                (new Date()).getTime() + Math.random()
-                            ).toFixed(10).replace('.', '');
+                            return generateUUID().replace(/\-/g, '');
                         };
-                        file.client_id = generate_client_id();
-                        */
+                        upload.client_id = generate_client_id();
                        
-                        var fileModel = new models.FileViewModel(file);
+                        var fileModel = new models.FileViewModel(upload);
                         uploadsModel.uploads.push(fileModel);
 
-                        file.on({
+                        upload.on({
                             // Called after received response from the server
                             onCompleted: function (response) {
-                                // console.log(file.client_id);
+                                // console.log(upload.client_id);
                                 // console.log(response);
                                 fileModel.uploadCompleted(true);
                             },
                             // Called during upload progress, first parameter
                             // is decimal value from 0 to 100.
                             onProgress: function (progress, fileSize, uploadedBytes) {
-                                // console.log(file.client_id);
+                                // console.log(upload.client_id);
                                 // console.log(progress);
                                 // console.log(fileSize);
                                 // console.log(uploadedBytes);
@@ -147,6 +143,9 @@
                                 fileModel.uploadProgress(progress_value);
                             }
                         });
+                    },
+                    onAllComplete: function(inputField) {
+                        console.log(inputField);
                     }
                 });
 
