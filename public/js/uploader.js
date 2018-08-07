@@ -36,6 +36,8 @@
         self.maxSimultaneousUploads = options.maxSimultaneousUploads || -1;
         self.onFileAdded = options.onFileAdded || noop;
         self.onAllComplete = options.onAllComplete || noop;
+        self.responses = [];
+        self.parseJson = options.parseJson || false;
         self.uploadUrl = options.uploadUrl;
         self.onFileAddedProxy = function (upload) {
             console.log('Event: onFileAdded, file: ' + upload.fileName);
@@ -207,6 +209,9 @@
                 // Reduce number of active uploads:
                 manager.activeUploads -= 1;
 
+                manager.responses.push(
+                    manager.parseJson ? JSON.parse(event.target.responseText) : event.target
+                );
                 upload.events.onCompleted(event.target.responseText);
 
                 // Check if there are any uploads left in a queue:

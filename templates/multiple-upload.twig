@@ -144,7 +144,10 @@
                             }
                         });
                     },
+                    parseJson: true,
                     onAllComplete: function(inputField) {
+                        var self = this;
+                        console.log(self.responses);
                         console.log(inputField);
                     }
                 });
